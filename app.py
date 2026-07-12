@@ -18,11 +18,15 @@ pattern):
     committed to source).
 
   - The user's own SE Ranking API key IS a per-user credential — declared
-    as a USER-writable secret the Panel's Secrets UI lets each user paste
-    in. Without it, project/ranking/harvest/audit endpoints require the
-    caller's own key and say so clearly when it's missing (keyword
-    research and domain analysis still work on the backend's shared
-    default key, since those aren't scoped to one account).
+    with write_mode="both" so it can be entered either via the platform's
+    Secrets panel OR via a proper in-extension form (a save_seranking_key
+    chat.function backed by a real ui.Form in the sidebar) — the form is
+    the primary, obvious UX; the Secrets panel is just the same value
+    surfaced platform-wide. Without it, project/ranking/harvest/audit
+    endpoints require the caller's own key and say so clearly when it's
+    missing (keyword research and domain analysis still work on the
+    backend's shared default key, since those aren't scoped to one
+    account).
 """
 from __future__ import annotations
 
@@ -79,24 +83,37 @@ ext.secret(
     ),
     required=True,
     write_mode="extension",
+    scope="app",
+    env_fallback="IMPERAL_APPSECRET_SE_RANKING_BACKEND_JWT",
     max_bytes=2048,
 )(lambda: None)
 
 # ── User-scope secret: the user's OWN SE Ranking API key ─────────────────────
-# Real per-user credential — Panel Secrets UI lets each user paste their own,
-# from https://online.seranking.com -> API section. Interpreted literally as
-# the key value: no URL is ever assembled or guessed from it.
+# Real per-user credential — every installer's own value. Interpreted
+# literally as the key value: no URL is ever assembled or guessed from it.
 ext.secret(
     name="seranking_api_key",
     description=(
         "Your SE Ranking API key (from online.seranking.com -> API). "
         "Used to fetch YOUR projects, rankings and keyword data — "
-        "never shared with other users."
+        "never shared with other users. Enter it via the form in the "
+        "sidebar, or the platform's Secrets panel — same value either way."
     ),
     required=False,
-    write_mode="user",
+    write_mode="both",
+    scope="user",
     max_bytes=200,
 )(lambda: None)
+
+
+async def seranking_key_status(ctx) -> dict:
+    """Masked status of the user's SE Ranking key, for forms/panels."""
+    key = await ctx.secrets.get("seranking_api_key")
+    key = (key or "").strip()
+    if not key:
+        return {"connected": False, "masked": ""}
+    tail = key[-4:] if len(key) >= 4 else key
+    return {"connected": True, "masked": f"••••{tail}"}
 
 
 @ext.health_check

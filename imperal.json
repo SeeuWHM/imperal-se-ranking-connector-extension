@@ -808,14 +808,17 @@
       "description": "Platform JWT authenticating this extension to the se-ranking-control backend microservice. Developer-managed only — never entered or seen by end users.",
       "required": true,
       "write_mode": "extension",
-      "max_bytes": 2048
+      "max_bytes": 2048,
+      "scope": "app",
+      "env_fallback": "IMPERAL_APPSECRET_SE_RANKING_BACKEND_JWT"
     },
     {
       "name": "seranking_api_key",
-      "description": "Your SE Ranking API key (from online.seranking.com -> API). Used to fetch YOUR projects, rankings and keyword data — never shared with other users.",
+      "description": "Your SE Ranking API key (from online.seranking.com -> API). Used to fetch YOUR projects, rankings and keyword data — never shared with other users. Enter it via the form in the sidebar, or the platform's Secrets panel — same value either way.",
       "required": false,
-      "write_mode": "user",
-      "max_bytes": 200
+      "write_mode": "both",
+      "max_bytes": 200,
+      "scope": "user"
     }
   ],
   "panels": [

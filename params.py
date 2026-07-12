@@ -55,3 +55,10 @@ class DomainKeywordsParams(BaseModel):
     country: str = Field(default="us")
     limit: int = Field(default=100, ge=1, le=1000)
     type: str = Field(default="organic", description="organic or paid")
+
+
+class SaveKeyParams(BaseModel):
+    seranking_api_key: str = Field(
+        ..., min_length=1, max_length=200,
+        description="Your SE Ranking API key, from online.seranking.com -> Profile -> API",
+    )
