@@ -87,7 +87,7 @@ async def fn_rankings(ctx, params: RankingsParams) -> ActionResult:
     data = await call_ser(ctx, "GET", f"/v1/rankings/{params.project_id}", params=q, require_user_key=True)
     if "error" in data:
         return _err(data)
-    kws = data.get("data") or []
+    kws = data.get("keywords") or []
     rankings = [RankingRecord(keyword=k.get("name", ""), position=str(k.get("current_position") or "-"),
                                change=k.get("change", 0), volume=k.get("volume", 0)) for k in kws[:30]]
     result = RankingsResponse(project_id=params.project_id, rankings=rankings, count=len(kws))
@@ -127,7 +127,7 @@ async def fn_opportunities(ctx, params: OpportunitiesParams) -> ActionResult:
     }, require_user_key=True)
     if "error" in data:
         return _err(data)
-    raw = data.get("data") or []
+    raw = data.get("opportunities") or []
     opps = [OpportunityRecord(keyword=o.get("keyword", ""), type=o.get("type", ""),
                                priority=o.get("priority_score", 0)) for o in raw[:30]]
     result = OpportunitiesResponse(project_id=params.project_id, opportunities=opps, count=len(raw))

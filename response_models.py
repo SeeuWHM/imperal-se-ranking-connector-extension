@@ -65,20 +65,39 @@ class KeywordCostEstimate(BaseModel):
     breakdown: dict = Field(default_factory=dict)
 
 
+class KeywordIdea(BaseModel):
+    """One expanded keyword idea — SE Ranking returns questions/related as
+    objects with real metrics (volume/difficulty/cpc), not bare strings."""
+    keyword: str = ""
+    volume: Optional[int] = None
+    difficulty: Optional[int] = None
+    cpc: Optional[float] = None
+    competition: Optional[float] = None
+    relevance: Optional[float] = None
+
+
 class KeywordResearchResponse(BaseModel):
     keyword: str = ""
     country: str = "us"
-    longtail: List[str] = Field(default_factory=list)
-    questions: List[str] = Field(default_factory=list)
-    related: List[str] = Field(default_factory=list)
+    longtail: List[str] = Field(default_factory=list)             # SE Ranking returns bare strings
+    questions: List[KeywordIdea] = Field(default_factory=list)    # SE Ranking returns objects
+    related: List[KeywordIdea] = Field(default_factory=list)      # SE Ranking returns objects
     total_credits_spent: float = 0
 
 
 class DomainOverviewResponse(BaseModel):
+    """Mirrors se-ranking-control's real /v1/domain/overview shape:
+    {organic: {keywords_count, traffic_sum, ...}, adv: [...]} — there is no
+    top-level traffic/keyword_count/top_pages field upstream."""
     domain: str = ""
-    traffic: Optional[float] = None
-    keyword_count: Optional[int] = None
-    top_pages: List[dict] = Field(default_factory=list)
+    keywords_count: Optional[int] = None
+    traffic_sum: Optional[int] = None
+    top1_5: Optional[int] = None
+    top6_10: Optional[int] = None
+    top11_20: Optional[int] = None
+    top21_50: Optional[int] = None
+    top51_100: Optional[int] = None
+    credits_spent: int = 0
 
 
 class DomainKeywordRecord(BaseModel):

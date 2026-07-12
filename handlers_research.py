@@ -73,8 +73,8 @@ async def fn_research_keywords(ctx, params: KeywordExpandParams) -> ActionResult
         return _err(data)
     result = KeywordResearchResponse(
         keyword=params.keyword, country=params.country,
-        longtail=data.get("longtail", []), questions=data.get("questions", []),
-        related=data.get("related", []),
+        longtail=data.get("longtail") or [], questions=data.get("questions") or [],
+        related=data.get("related") or [],
         total_credits_spent=data.get("total_credits_spent", 0),
     )
     return ActionResult.success(data=result, summary=f"Keyword research for '{params.keyword}' complete")
@@ -100,11 +100,17 @@ async def fn_domain_overview(ctx, params: DomainOverviewParams) -> ActionResult:
     })
     if "error" in data:
         return _err(data)
+    organic = data.get("organic") or {}
     result = DomainOverviewResponse(
-        domain=params.domain, traffic=data.get("traffic"),
-        keyword_count=data.get("keyword_count"), top_pages=data.get("top_pages", []),
+        domain=params.domain,
+        keywords_count=organic.get("keywords_count"),
+        traffic_sum=organic.get("traffic_sum"),
+        top1_5=organic.get("top1_5"), top6_10=organic.get("top6_10"),
+        top11_20=organic.get("top11_20"), top21_50=organic.get("top21_50"),
+        top51_100=organic.get("top51_100"),
+        credits_spent=data.get("credits_spent", 0),
     )
-    return ActionResult.success(data=result, summary=f"Overview for {params.domain}")
+    return ActionResult.success(data=result, summary=f"Overview for {params.domain}: {organic.get('keywords_count', 0)} organic keywords")
 
 
 @chat.function(
