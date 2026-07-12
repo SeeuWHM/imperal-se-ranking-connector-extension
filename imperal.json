@@ -791,6 +791,125 @@
       "long_running": false,
       "scopes": [],
       "owner_chat_tool": "se_ranking"
+    },
+    {
+      "name": "connection_status",
+      "description": "Whether the user's own SE Ranking API key is connected. Use for: подключен ли SE Ranking, is my account connected, connection status.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "description": "No input required.",
+        "properties": {},
+        "title": "_EmptyParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connected": {
+            "default": false,
+            "title": "Connected",
+            "type": "boolean"
+          },
+          "masked_key": {
+            "default": "",
+            "title": "Masked Key",
+            "type": "string"
+          }
+        },
+        "title": "ConnectionStatus",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "se_ranking"
+    },
+    {
+      "name": "save_seranking_key",
+      "description": "Connect your own SE Ranking account by saving your API key. Validates the key against SE Ranking before saving — rejects it if invalid. Use for: подключи мой SE Ranking, сохрани ключ, connect my SE Ranking account, save my API key, add seranking key.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "update:secret"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "seranking_api_key": {
+            "description": "Your SE Ranking API key, from online.seranking.com -> Profile -> API",
+            "maxLength": 200,
+            "minLength": 1,
+            "title": "Seranking Api Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "seranking_api_key"
+        ],
+        "title": "SaveKeyParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connected": {
+            "default": false,
+            "title": "Connected",
+            "type": "boolean"
+          },
+          "masked_key": {
+            "default": "",
+            "title": "Masked Key",
+            "type": "string"
+          }
+        },
+        "title": "ConnectionStatus",
+        "type": "object"
+      },
+      "event": "se-ranking-connector.save_seranking_key",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "se_ranking"
+    },
+    {
+      "name": "disconnect_seranking",
+      "description": "Disconnect your SE Ranking account — removes the saved API key. Use for: отключи SE Ranking, disconnect my account, remove my API key, забудь мой ключ.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "delete:secret"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "description": "No input required.",
+        "properties": {},
+        "title": "_EmptyParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "connected": {
+            "default": false,
+            "title": "Connected",
+            "type": "boolean"
+          },
+          "masked_key": {
+            "default": "",
+            "title": "Masked Key",
+            "type": "string"
+          }
+        },
+        "title": "ConnectionStatus",
+        "type": "object"
+      },
+      "event": "se-ranking-connector.disconnect_seranking",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "se_ranking"
     }
   ],
   "signals": [],

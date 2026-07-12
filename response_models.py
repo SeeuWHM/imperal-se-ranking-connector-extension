@@ -105,3 +105,8 @@ class AuditResponse(BaseModel):
     project_id: int
     issues: List[AuditIssue] = Field(default_factory=list)
     count: int = 0
+
+
+class ConnectionStatus(BaseModel):
+    connected: bool = False
+    masked_key: str = ""

@@ -4,14 +4,16 @@ The backend base URL is a baked-in constant (app.py) — the public API
 gateway host every extension on this platform calls, not a per-user secret.
 
 Two distinct secrets are involved on every call:
-  - `backend_jwt`      (write_mode="extension") — authenticates THIS
-                         EXTENSION to se-ranking-control. Developer-set only
-                         via developer.save_app_secret; never entered or
-                         seen by end users, never committed to source.
-  - `seranking_api_key` (write_mode="user")      — the CALLER's own SE
-                         Ranking account key, forwarded as X-SER-API-Key so
-                         the backend can fetch/cache/meter data scoped to
-                         that one user.
+  - `backend_jwt`      (scope="app", write_mode="extension") — authenticates
+                         THIS EXTENSION to se-ranking-control. Developer-set
+                         only via developer.save_app_secret; never entered
+                         or seen by end users, never committed to source.
+  - `seranking_api_key` (scope="user", write_mode="both")    — the CALLER's
+                         own SE Ranking account key, forwarded as
+                         X-SER-API-Key so the backend can fetch/cache/meter
+                         data scoped to that one user. Settable either via
+                         the platform Secrets panel or this extension's own
+                         save_seranking_key form (handlers_settings.py).
 
 Without a JWT, every call fails fast with a clear internal-config error
 (never silently falls back — a missing platform secret is our bug, not the
@@ -44,7 +46,8 @@ async def ser_ready(ctx) -> bool:
 
 async def call_ser(ctx, method: str, path: str, params: dict | None = None,
                     json: dict | None = None, timeout: int = TIMEOUT,
-                    require_user_key: bool = False) -> dict:
+                    require_user_key: bool = False,
+                    headers_override: dict | None = None) -> dict:
     """Call the se-ranking-control backend.
 
     `require_user_key=True` short-circuits with a friendly config error for
@@ -53,6 +56,10 @@ async def call_ser(ctx, method: str, path: str, params: dict | None = None,
     research and domain analysis work against any target keyword/domain, so
     those pass require_user_key=False and work even before the user
     connects their own key (using the backend's shared default key).
+
+    `headers_override` lets a caller supply a CANDIDATE X-SER-API-Key (e.g.
+    to validate a key before it's saved) without reading/writing the
+    stored secret — merged on top of the normal headers.
     """
     base_url = _normalize_backend_url(SERVER_URL)
     if not base_url:
@@ -66,7 +73,7 @@ async def call_ser(ctx, method: str, path: str, params: dict | None = None,
         }
 
     user_key = await ctx.secrets.get("seranking_api_key")
-    if require_user_key and not (user_key and user_key.strip()):
+    if require_user_key and not (headers_override or (user_key and user_key.strip())):
         return {
             "error": (
                 "Connect your own SE Ranking account first — open Settings and add your "
@@ -78,6 +85,8 @@ async def call_ser(ctx, method: str, path: str, params: dict | None = None,
     headers = {"Authorization": f"Bearer {backend_jwt}"}
     if user_key and user_key.strip():
         headers["X-SER-API-Key"] = user_key.strip()
+    if headers_override:
+        headers.update(headers_override)
 
     url = f"{base_url}{path}"
     if method.upper() == "GET":
