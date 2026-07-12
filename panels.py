@@ -60,20 +60,47 @@ async def sidebar_panel(ctx):
     projects = data.get("data") or []
     total_keywords = sum(p.get("keyword_count", 0) for p in projects)
 
+    # Show the projects that actually matter first: ranked by tracked
+    # keyword count, empty/test projects (0 keywords) pushed to the bottom
+    # and omitted from the top-8 preview entirely so the panel isn't a
+    # noisy insertion-order dump of a 30-project account.
+    tracked = sorted(
+        (p for p in projects if p.get("keyword_count", 0) > 0),
+        key=lambda p: p.get("keyword_count", 0),
+        reverse=True,
+    )
+    shown = tracked[:8]
+    remaining = len(projects) - len(shown)
+
+    list_or_empty = (
+        ui.List(items=[
+            ui.ListItem(id=str(p.get("id", "")), title=p.get("title") or p.get("url", "untitled"),
+                        subtitle=p.get("url", ""),
+                        meta=f"{p.get('keyword_count', 0)} kw")
+            for p in shown
+        ])
+        if shown else
+        ui.Text(content="No tracked keywords yet on any project — add one at seranking.com.", variant="caption")
+    )
+
+    footer = (
+        [ui.Text(content=f"+ {remaining} more projects (see full list in chat: \"list my SE Ranking projects\")",
+                 variant="caption")]
+        if remaining > 0 else []
+    )
+
     return ui.Stack(children=[
         ui.Header(text="SE Ranking", level=4),
         ui.Badge(label="● connected", color="green"),
         ui.Divider(),
         ui.Stats(children=[
-            ui.Stat(label="Projects", value=len(projects)),
-            ui.Stat(label="Keywords tracked", value=total_keywords),
+            ui.Stat(label="Projects", value=str(len(projects)), icon="Folder"),
+            ui.Stat(label="Keywords tracked", value=f"{total_keywords:,}", icon="Hash"),
         ]),
         ui.Divider(),
-        ui.List(items=[
-            ui.ListItem(id=str(p.get("id", "")), title=p.get("title", ""), subtitle=p.get("url", ""),
-                        meta=f"{p.get('keyword_count', 0)} kw")
-            for p in projects[:8]
-        ]) if projects else ui.Text(content="No projects yet — add one at seranking.com.", variant="caption"),
+        ui.Text(content="Top projects by tracked keywords", variant="caption"),
+        list_or_empty,
+        *footer,
         ui.Divider(),
         ui.Button(label="Disconnect", variant="ghost", size="sm",
                   on_click=ui.Call("disconnect_seranking")),
