@@ -25,9 +25,9 @@ async def sidebar_panel(ctx):
                 ),
                 type="info",
             ),
-            ui.Text(text="Open Settings (gear icon in the top bar) → Secrets → "
-                         "'SE Ranking API Key' to paste your key from "
-                         "seranking.com → Profile → API.", size="sm", color="muted"),
+            ui.Text(content="Open Settings (gear icon in the top bar) → Secrets → "
+                            "'SE Ranking API Key' to paste your key from "
+                            "seranking.com → Profile → API.", variant="caption"),
         ])
 
     data = await call_ser(ctx, "GET", "/v1/projects", require_user_key=True)
@@ -54,5 +54,5 @@ async def sidebar_panel(ctx):
             ui.ListItem(id=str(p.get("id", "")), title=p.get("title", ""), subtitle=p.get("url", ""),
                         meta=f"{p.get('keyword_count', 0)} kw")
             for p in projects[:8]
-        ]) if projects else ui.Text(text="No projects yet — add one at seranking.com.", size="sm", color="muted"),
+        ]) if projects else ui.Text(content="No projects yet — add one at seranking.com.", variant="caption"),
     ])
