@@ -76,7 +76,8 @@ async def sidebar_panel(ctx):
         ui.List(items=[
             ui.ListItem(id=str(p.get("id", "")), title=p.get("title") or p.get("url", "untitled"),
                         subtitle=p.get("url", ""),
-                        meta=f"{p.get('keyword_count', 0)} kw")
+                        meta=f"{p.get('keyword_count', 0)} kw",
+                        on_click=ui.Call("__panel__workspace", project_id=str(p.get("id", ""))))
             for p in shown
         ])
         if shown else
@@ -89,7 +90,7 @@ async def sidebar_panel(ctx):
         if remaining > 0 else []
     )
 
-    return ui.Stack(children=[
+    root = ui.Stack(children=[
         ui.Header(text="SE Ranking", level=4),
         ui.Badge(label="● connected", color="green"),
         ui.Divider(),
@@ -98,10 +99,15 @@ async def sidebar_panel(ctx):
             ui.Stat(label="Keywords tracked", value=f"{total_keywords:,}", icon="Hash"),
         ]),
         ui.Divider(),
-        ui.Text(content="Top projects by tracked keywords", variant="caption"),
+        ui.Text(content="Top projects by tracked keywords — click one to open", variant="caption"),
         list_or_empty,
         *footer,
         ui.Divider(),
         ui.Button(label="Disconnect", variant="ghost", size="sm",
                   on_click=ui.Call("disconnect_seranking")),
     ])
+    # Claim the center slot — without this, project clicks from here would
+    # open in "right" instead of "center" (same fix as article-writer's
+    # sidebar needed).
+    root.props["auto_action"] = ui.Call("__panel__workspace").to_dict()
+    return root

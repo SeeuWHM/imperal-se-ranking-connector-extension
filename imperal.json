@@ -475,6 +475,80 @@
         "type": "object"
       },
       "return_schema": {
+        "$defs": {
+          "KeywordIdea": {
+            "description": "One expanded keyword idea — SE Ranking returns questions/related as\nobjects with real metrics (volume/difficulty/cpc), not bare strings.",
+            "properties": {
+              "keyword": {
+                "default": "",
+                "title": "Keyword",
+                "type": "string"
+              },
+              "volume": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Volume"
+              },
+              "difficulty": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Difficulty"
+              },
+              "cpc": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Cpc"
+              },
+              "competition": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Competition"
+              },
+              "relevance": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Relevance"
+              }
+            },
+            "title": "KeywordIdea",
+            "type": "object"
+          }
+        },
         "properties": {
           "keyword": {
             "default": "",
@@ -495,14 +569,14 @@
           },
           "questions": {
             "items": {
-              "type": "string"
+              "$ref": "#/$defs/KeywordIdea"
             },
             "title": "Questions",
             "type": "array"
           },
           "related": {
             "items": {
-              "type": "string"
+              "$ref": "#/$defs/KeywordIdea"
             },
             "title": "Related",
             "type": "array"
@@ -549,25 +623,14 @@
         "type": "object"
       },
       "return_schema": {
+        "description": "Mirrors se-ranking-control's real /v1/domain/overview shape:\n{organic: {keywords_count, traffic_sum, ...}, adv: [...]} — there is no\ntop-level traffic/keyword_count/top_pages field upstream.",
         "properties": {
           "domain": {
             "default": "",
             "title": "Domain",
             "type": "string"
           },
-          "traffic": {
-            "anyOf": [
-              {
-                "type": "number"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "default": null,
-            "title": "Traffic"
-          },
-          "keyword_count": {
+          "keywords_count": {
             "anyOf": [
               {
                 "type": "integer"
@@ -577,15 +640,84 @@
               }
             ],
             "default": null,
-            "title": "Keyword Count"
+            "title": "Keywords Count"
           },
-          "top_pages": {
-            "items": {
-              "additionalProperties": true,
-              "type": "object"
-            },
-            "title": "Top Pages",
-            "type": "array"
+          "traffic_sum": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Traffic Sum"
+          },
+          "top1_5": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Top1 5"
+          },
+          "top6_10": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Top6 10"
+          },
+          "top11_20": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Top11 20"
+          },
+          "top21_50": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Top21 50"
+          },
+          "top51_100": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Top51 100"
+          },
+          "credits_spent": {
+            "default": 0,
+            "title": "Credits Spent",
+            "type": "integer"
           }
         },
         "title": "DomainOverviewResponse",
@@ -950,6 +1082,12 @@
     {
       "panel_id": "sidebar",
       "slot": "left",
+      "title": "SE Ranking",
+      "tree": {}
+    },
+    {
+      "panel_id": "workspace",
+      "slot": "center",
       "title": "SE Ranking",
       "tree": {}
     }
