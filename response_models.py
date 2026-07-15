@@ -239,3 +239,23 @@ class DomainAuthorityResult(BaseModel):
 class ConnectionStatus(BaseModel):
     connected: bool = False
     masked_key: str = ""
+
+
+class SerAccountRecord(BaseModel):
+    label: str = ""
+    masked_key: str = ""
+    is_active: bool = False
+
+
+class SerAccountsList(BaseModel):
+    accounts: List[SerAccountRecord] = Field(default_factory=list)
+    count: int = 0
+
+
+class SerAccountSwitched(BaseModel):
+    active: str = ""
+
+
+class SerAccountDisconnected(BaseModel):
+    label: str = ""
+    remaining: int = 0

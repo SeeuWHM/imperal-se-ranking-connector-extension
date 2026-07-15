@@ -62,6 +62,15 @@ class SaveKeyParams(BaseModel):
         ..., min_length=1, max_length=200,
         description="Your SE Ranking API key, from online.seranking.com -> Profile -> API",
     )
+    label: str = Field(
+        default="", max_length=60,
+        description="Optional display name for this account (e.g. 'Agency', 'Client X'). "
+                    "Auto-generated if omitted.",
+    )
+
+
+class AccountLabelParams(BaseModel):
+    label: str = Field(..., description="Account label (from list_seranking_accounts)")
 
 
 # ── Competitors ──────────────────────────────────────────────────────────────

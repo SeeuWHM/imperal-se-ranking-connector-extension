@@ -3,27 +3,28 @@
 The backend base URL is a baked-in constant (app.py) — the public API
 gateway host every extension on this platform calls, not a per-user secret.
 
-Two distinct secrets are involved on every call:
+Two distinct credentials are involved on every call:
   - `backend_jwt`      (scope="app", write_mode="extension") — authenticates
                          THIS EXTENSION to se-ranking-control. Developer-set
                          only via developer.save_app_secret; never entered
                          or seen by end users, never committed to source.
-  - `seranking_api_key` (scope="user", write_mode="both")    — the CALLER's
-                         own SE Ranking account key, forwarded as
-                         X-SER-API-Key so the backend can fetch/cache/meter
-                         data scoped to that one user. Settable either via
-                         the platform Secrets panel or this extension's own
-                         save_seranking_key form (handlers_settings.py).
+  - the caller's ACTIVE SE Ranking account key (accounts.py — multi-account
+                         store, several keys connected + switchable), forwarded
+                         as X-SER-API-Key so the backend can fetch/cache/meter
+                         data scoped to that one account. Settable via the
+                         sidebar's Connect form (handlers_settings.py); several
+                         accounts can be connected and switched between.
 
 Without a JWT, every call fails fast with a clear internal-config error
 (never silently falls back — a missing platform secret is our bug, not the
-user's). Without the user's own SE Ranking key, project/ranking/harvest/
-audit calls return a friendly "connect your account" message instead of
-silently using someone else's data.
+user's). Without an active SE Ranking key, project/ranking/harvest/audit
+calls return a friendly "connect your account" message instead of silently
+using someone else's data.
 """
 from __future__ import annotations
 
 from app import SERVER_URL
+from accounts import _active_api_key
 
 TIMEOUT = 30
 HEAVY_TIMEOUT = 90  # research/brief-style calls: several sequential SE Ranking API calls
@@ -39,9 +40,9 @@ def _normalize_backend_url(raw: str) -> str:
 
 
 async def ser_ready(ctx) -> bool:
-    """Whether the caller has their own SE Ranking API key configured."""
-    key = await ctx.secrets.get("seranking_api_key")
-    return bool(key and key.strip())
+    """Whether the caller has at least one SE Ranking account connected."""
+    key = await _active_api_key(ctx)
+    return bool(key)
 
 
 async def call_ser(ctx, method: str, path: str, params: dict | None = None,
@@ -72,8 +73,8 @@ async def call_ser(ctx, method: str, path: str, params: dict | None = None,
             "_config": True,
         }
 
-    user_key = await ctx.secrets.get("seranking_api_key")
-    if require_user_key and not (headers_override or (user_key and user_key.strip())):
+    user_key = await _active_api_key(ctx)
+    if require_user_key and not (headers_override or user_key):
         return {
             "error": (
                 "Connect your own SE Ranking account first — open Settings and add your "
@@ -83,8 +84,8 @@ async def call_ser(ctx, method: str, path: str, params: dict | None = None,
         }
 
     headers = {"Authorization": f"Bearer {backend_jwt}"}
-    if user_key and user_key.strip():
-        headers["X-SER-API-Key"] = user_key.strip()
+    if user_key:
+        headers["X-SER-API-Key"] = user_key
     if headers_override:
         headers.update(headers_override)
 

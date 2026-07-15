@@ -40,7 +40,7 @@ SERVER_URL = os.environ.get("SER_BACKEND_URL", "") or "https://api.webhostmost.c
 
 ext = Extension(
     "se-ranking-connector",
-    version="1.0.0",
+    version="1.1.0",
     display_name="SE Ranking Connector",
     description=(
         "SEO rank tracking and keyword research powered by SE Ranking: project "
@@ -88,16 +88,27 @@ ext.secret(
     max_bytes=2048,
 )(lambda: None)
 
-# ── User-scope secret: the user's OWN SE Ranking API key ─────────────────────
-# Real per-user credential — every installer's own value. Interpreted
-# literally as the key value: no URL is ever assembled or guessed from it.
+# ── User-scope secret: the user's OWN SE Ranking API key(s) ──────────────────
+# Real per-user credential(s). Interpreted literally as the key value(s): no
+# URL is ever assembled or guessed from it.
+#
+# `seranking_api_key` (legacy, single value, write_mode="both") is kept
+# declared so existing installs that already saved a key via the platform's
+# general Secrets panel keep working — accounts.py transparently migrates it
+# into the new multi-account store on first read.
+#
+# `seranking_accounts` (current, JSON list, write_mode="extension" — only
+# this extension's own handlers write it, never the generic Secrets panel,
+# since its shape is a JSON blob of {label, api_key, is_active} records, not
+# a single opaque value) is the real source of truth: multiple SE Ranking
+# accounts connected simultaneously, one active at a time, switchable —
+# same pattern as mail-client's `imap_credentials`.
 ext.secret(
     name="seranking_api_key",
     description=(
-        "Your SE Ranking API key (from online.seranking.com -> API). "
-        "Used to fetch YOUR projects, rankings and keyword data — "
-        "never shared with other users. Enter it via the form in the "
-        "sidebar, or the platform's Secrets panel — same value either way."
+        "(Legacy) Your SE Ranking API key. Superseded by seranking_accounts "
+        "(multi-account) — kept only so pre-existing single-key connections "
+        "keep working; new connections go through the sidebar's Connect form."
     ),
     required=False,
     write_mode="both",
@@ -105,19 +116,24 @@ ext.secret(
     max_bytes=200,
 )(lambda: None)
 
-
-async def seranking_key_status(ctx) -> dict:
-    """Masked status of the user's SE Ranking key, for forms/panels."""
-    key = await ctx.secrets.get("seranking_api_key")
-    key = (key or "").strip()
-    if not key:
-        return {"connected": False, "masked": ""}
-    tail = key[-4:] if len(key) >= 4 else key
-    return {"connected": True, "masked": f"••••{tail}"}
+ext.secret(
+    name="seranking_accounts",
+    description=(
+        "Every SE Ranking account you've connected (JSON list of "
+        "{label, api_key, is_active}) — lets you track multiple SE Ranking "
+        "accounts and switch between them. Managed only through this "
+        "extension's own connect/switch/disconnect actions, never edited "
+        "directly."
+    ),
+    required=False,
+    write_mode="extension",
+    scope="user",
+    max_bytes=8192,
+)(lambda: None)
 
 
 @ext.health_check
 async def health(ctx) -> dict:
-    """Report whether the user's own SE Ranking key is configured."""
-    key = await ctx.secrets.get("seranking_api_key")
-    return {"status": "ok", "version": ext.version, "seranking_connected": bool(key and key.strip())}
+    """Report whether the user has at least one SE Ranking account connected."""
+    from accounts import ser_ready
+    return {"status": "ok", "version": ext.version, "seranking_connected": await ser_ready(ctx)}

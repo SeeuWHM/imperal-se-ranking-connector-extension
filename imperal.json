@@ -1,8 +1,8 @@
 {
   "manifest_schema_version": 3,
-  "sdk_version": "5.9.3",
+  "sdk_version": "5.9.6",
   "app_id": "se-ranking-connector",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "name": "SE Ranking Connector",
   "description": "SEO rank tracking and keyword research powered by SE Ranking: project rankings, content opportunities (quick wins, CTR gaps), keyword research (longtail/related/questions), domain analysis and project health audits. Connect your own SE Ranking account to track your own projects.",
   "icon": "icon.svg",
@@ -978,7 +978,7 @@
     },
     {
       "name": "save_seranking_key",
-      "description": "Connect your own SE Ranking account by saving your API key. Validates the key against SE Ranking before saving — rejects it if invalid. Use for: подключи мой SE Ranking, сохрани ключ, connect my SE Ranking account, save my API key, add seranking key.",
+      "description": "Connect your own SE Ranking account by saving your API key. Validates the key against SE Ranking before saving — rejects it if invalid. Connecting again adds ANOTHER account (each with its own label) rather than replacing the current one — use switch_account to change which one is active. Use for: подключи мой SE Ranking, сохрани ключ, connect my SE Ranking account, save my API key, add seranking key, добавь ещё один аккаунт SE Ranking.",
       "action_type": "write",
       "chain_callable": true,
       "effects": [
@@ -992,6 +992,13 @@
             "maxLength": 200,
             "minLength": 1,
             "title": "Seranking Api Key",
+            "type": "string"
+          },
+          "label": {
+            "default": "",
+            "description": "Optional display name for this account (e.g. 'Agency', 'Client X'). Auto-generated if omitted.",
+            "maxLength": 60,
+            "title": "Label",
             "type": "string"
           }
         },
@@ -1024,9 +1031,154 @@
       "owner_chat_tool": "se_ranking"
     },
     {
-      "name": "disconnect_seranking",
-      "description": "Disconnect your SE Ranking account — removes the saved API key. Use for: отключи SE Ranking, disconnect my account, remove my API key, забудь мой ключ.",
+      "name": "list_seranking_accounts",
+      "description": "List every SE Ranking account you've connected — label, masked key, which one is active. Use for: покажи мои аккаунты se ranking, list connected accounts, which SE Ranking account is active.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "description": "No input required.",
+        "properties": {},
+        "title": "_EmptyParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "$defs": {
+          "SerAccountRecord": {
+            "properties": {
+              "label": {
+                "default": "",
+                "title": "Label",
+                "type": "string"
+              },
+              "masked_key": {
+                "default": "",
+                "title": "Masked Key",
+                "type": "string"
+              },
+              "is_active": {
+                "default": false,
+                "title": "Is Active",
+                "type": "boolean"
+              }
+            },
+            "title": "SerAccountRecord",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "accounts": {
+            "items": {
+              "$ref": "#/$defs/SerAccountRecord"
+            },
+            "title": "Accounts",
+            "type": "array"
+          },
+          "count": {
+            "default": 0,
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "title": "SerAccountsList",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "se_ranking"
+    },
+    {
+      "name": "switch_seranking_account",
+      "description": "Switch which connected SE Ranking account is active — all following SE Ranking calls (projects, rankings, keywords…) use this account's key. Use for: переключи аккаунт se ranking, switch to account X, use my other SE Ranking key.",
       "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "update:secret"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "label": {
+            "description": "Account label (from list_seranking_accounts)",
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label"
+        ],
+        "title": "AccountLabelParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "active": {
+            "default": "",
+            "title": "Active",
+            "type": "string"
+          }
+        },
+        "title": "SerAccountSwitched",
+        "type": "object"
+      },
+      "event": "se-ranking-connector.switch_account",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "se_ranking"
+    },
+    {
+      "name": "disconnect_seranking_account",
+      "description": "Disconnect ONE specific connected SE Ranking account by its label — removes only that key, other connected accounts stay untouched. Use for: отключи этот аккаунт se ranking, remove this specific account.",
+      "action_type": "destructive",
+      "chain_callable": true,
+      "effects": [
+        "delete:secret"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "label": {
+            "description": "Account label (from list_seranking_accounts)",
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label"
+        ],
+        "title": "AccountLabelParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "label": {
+            "default": "",
+            "title": "Label",
+            "type": "string"
+          },
+          "remaining": {
+            "default": 0,
+            "title": "Remaining",
+            "type": "integer"
+          }
+        },
+        "title": "SerAccountDisconnected",
+        "type": "object"
+      },
+      "event": "se-ranking-connector.disconnect_account",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "se_ranking"
+    },
+    {
+      "name": "disconnect_seranking",
+      "description": "Disconnect your SE Ranking account(s) — removes ALL saved API keys. Use for: отключи SE Ranking, disconnect my account, remove my API key, забудь мой ключ, disconnect everything.",
+      "action_type": "destructive",
       "chain_callable": true,
       "effects": [
         "delete:secret"
@@ -1996,10 +2148,18 @@
     },
     {
       "name": "seranking_api_key",
-      "description": "Your SE Ranking API key (from online.seranking.com -> API). Used to fetch YOUR projects, rankings and keyword data — never shared with other users. Enter it via the form in the sidebar, or the platform's Secrets panel — same value either way.",
+      "description": "(Legacy) Your SE Ranking API key. Superseded by seranking_accounts (multi-account) — kept only so pre-existing single-key connections keep working; new connections go through the sidebar's Connect form.",
       "required": false,
       "write_mode": "both",
       "max_bytes": 200,
+      "scope": "user"
+    },
+    {
+      "name": "seranking_accounts",
+      "description": "Every SE Ranking account you've connected (JSON list of {label, api_key, is_active}) — lets you track multiple SE Ranking accounts and switch between them. Managed only through this extension's own connect/switch/disconnect actions, never edited directly.",
+      "required": false,
+      "write_mode": "extension",
+      "max_bytes": 8192,
       "scope": "user"
     }
   ],
@@ -2008,19 +2168,38 @@
       "panel_id": "secrets",
       "slot": "right",
       "title": "Secrets",
-      "tree": {}
+      "tree": {},
+      "icon": "KeyRound",
+      "refresh": "manual",
+      "center_overlay": false
     },
     {
       "panel_id": "sidebar",
       "slot": "left",
       "title": "SE Ranking",
-      "tree": {}
+      "tree": {},
+      "icon": "TrendingUp",
+      "refresh": "on_event:se-ranking-connector.switch_account,se-ranking-connector.disconnect_account",
+      "center_overlay": false,
+      "default_width": 260
+    },
+    {
+      "panel_id": "sidebar_add_account",
+      "slot": "overlay",
+      "title": "Add SE Ranking Account",
+      "tree": {},
+      "icon": "Plus",
+      "refresh": "manual",
+      "center_overlay": false
     },
     {
       "panel_id": "workspace",
       "slot": "center",
       "title": "SE Ranking",
-      "tree": {}
+      "tree": {},
+      "icon": "TrendingUp",
+      "refresh": "manual",
+      "center_overlay": false
     }
   ]
 }
