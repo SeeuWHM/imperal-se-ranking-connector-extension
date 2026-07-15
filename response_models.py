@@ -126,6 +126,82 @@ class AuditResponse(BaseModel):
     count: int = 0
 
 
+# ── Competitors ──────────────────────────────────────────────────────────────
+
+class CompetitorRecord(BaseModel):
+    id: int
+    name: str = ""
+    url: str = ""
+    domain_trust: Optional[int] = None
+
+
+class CompetitorListResponse(BaseModel):
+    project_id: int
+    competitors: List[CompetitorRecord] = Field(default_factory=list)
+    count: int = 0
+
+
+class AddCompetitorResult(BaseModel):
+    id: int
+    url: str = ""
+    name: str = ""
+
+
+class CompetitorPositionRecord(BaseModel):
+    keyword: str = ""
+    position: Optional[int] = None
+    change: Optional[int] = None
+    volume: Optional[int] = None
+
+
+class CompetitorPositionsResult(BaseModel):
+    project_id: int
+    competitor_id: int
+    positions: List[CompetitorPositionRecord] = Field(default_factory=list)
+    count: int = 0
+
+
+class SerpResultRecord(BaseModel):
+    position: Optional[int] = None
+    url: str = ""
+    domain: str = ""
+    backlinks: Optional[int] = None
+    referring_domains: Optional[int] = None
+
+
+class SerpTop10Result(BaseModel):
+    project_id: int
+    keyword_id: int
+    results: List[SerpResultRecord] = Field(default_factory=list)
+    count: int = 0
+
+
+class AllCompetitorRecord(BaseModel):
+    domain: str = ""
+    backlinks: Optional[str] = None
+    domains: Optional[str] = None
+    visibility: Optional[float] = None
+
+
+class AllCompetitorsResult(BaseModel):
+    project_id: int
+    competitors: List[AllCompetitorRecord] = Field(default_factory=list)
+    count: int = 0
+
+
+class CompetitorGapRecord(BaseModel):
+    keyword: str = ""
+    competitor: str = ""
+    competitor_position: int = 0
+    our_position: Optional[int] = None
+
+
+class CompetitorGapsResult(BaseModel):
+    project_id: int
+    gaps: List[CompetitorGapRecord] = Field(default_factory=list)
+    count: int = 0
+
+
 class ConnectionStatus(BaseModel):
     connected: bool = False
     masked_key: str = ""

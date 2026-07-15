@@ -62,3 +62,44 @@ class SaveKeyParams(BaseModel):
         ..., min_length=1, max_length=200,
         description="Your SE Ranking API key, from online.seranking.com -> Profile -> API",
     )
+
+
+# ── Competitors ──────────────────────────────────────────────────────────────
+
+class ListCompetitorsParams(BaseModel):
+    project_id: int = Field(..., description="SE Ranking project ID")
+
+
+class AddCompetitorParams(BaseModel):
+    project_id: int = Field(..., description="SE Ranking project ID")
+    url: str = Field(..., description="Competitor domain to track, e.g. hostinger.com")
+    name: Optional[str] = Field(default=None, description="Optional display name for the competitor")
+
+
+class DeleteCompetitorParams(BaseModel):
+    project_id: int = Field(..., description="SE Ranking project ID")
+    competitor_id: int = Field(..., description="Competitor ID (from list_competitors)")
+
+
+class CompetitorPositionsParams(BaseModel):
+    project_id: int = Field(..., description="SE Ranking project ID")
+    competitor_id: int = Field(..., description="Competitor ID (from list_competitors)")
+    engine_id: Optional[int] = Field(default=None, description="Filter by search engine ID")
+
+
+class SerpTop10Params(BaseModel):
+    project_id: int = Field(..., description="SE Ranking project ID")
+    keyword_id: int = Field(..., description="Keyword ID (from the rankings response)")
+    engine_id: int = Field(..., description="Search engine ID (from list_projects search engines)")
+    date: Optional[str] = Field(default=None, description="Date YYYY-MM-DD, defaults to latest")
+
+
+class AllCompetitorsParams(BaseModel):
+    project_id: int = Field(..., description="SE Ranking project ID")
+    engine_id: Optional[int] = Field(default=None, description="Filter by search engine ID")
+    date: Optional[str] = Field(default=None, description="Date YYYY-MM-DD, defaults to today")
+
+
+class CompetitorGapsParams(BaseModel):
+    project_id: int = Field(..., description="SE Ranking project ID")
+    engine_id: Optional[int] = Field(default=None, description="Filter by search engine ID")

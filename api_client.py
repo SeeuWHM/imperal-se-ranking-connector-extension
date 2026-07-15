@@ -93,6 +93,8 @@ async def call_ser(ctx, method: str, path: str, params: dict | None = None,
         resp = await ctx.http.get(url, params=params or {}, headers=headers, timeout=timeout)
     elif method.upper() == "POST":
         resp = await ctx.http.post(url, params=params or {}, json=json or {}, headers=headers, timeout=timeout)
+    elif method.upper() == "DELETE":
+        resp = await ctx.http.delete(url, params=params or {}, headers=headers, timeout=timeout)
     else:
         return {"error": f"Unsupported method {method}", "_config": True}
 
@@ -105,4 +107,6 @@ async def call_ser(ctx, method: str, path: str, params: dict | None = None,
         msg = detail.get("detail", detail) if isinstance(detail, dict) else detail
         return {"error": f"SE Ranking error: {msg}", "_config": False}
 
+    if resp.status_code == 204 or not resp.body:
+        return {"ok": True}
     return resp.body if isinstance(resp.body, dict) else {"data": resp.body}
