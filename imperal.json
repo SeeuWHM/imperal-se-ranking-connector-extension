@@ -1042,6 +1042,705 @@
       "long_running": false,
       "scopes": [],
       "owner_chat_tool": "se_ranking"
+    },
+    {
+      "name": "list_competitors",
+      "description": "List the competitor domains tracked for a SE Ranking project. Use for: какие конкуренты отслеживаются, list my competitors, show tracked competitor domains.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "project_id": {
+            "description": "SE Ranking project ID",
+            "title": "Project Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "project_id"
+        ],
+        "title": "ListCompetitorsParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "$defs": {
+          "CompetitorRecord": {
+            "properties": {
+              "id": {
+                "title": "Id",
+                "type": "integer"
+              },
+              "name": {
+                "default": "",
+                "title": "Name",
+                "type": "string"
+              },
+              "url": {
+                "default": "",
+                "title": "Url",
+                "type": "string"
+              },
+              "domain_trust": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Domain Trust"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "title": "CompetitorRecord",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "project_id": {
+            "title": "Project Id",
+            "type": "integer"
+          },
+          "competitors": {
+            "items": {
+              "$ref": "#/$defs/CompetitorRecord"
+            },
+            "title": "Competitors",
+            "type": "array"
+          },
+          "count": {
+            "default": 0,
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "project_id"
+        ],
+        "title": "CompetitorListResponse",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "se_ranking"
+    },
+    {
+      "name": "add_competitor",
+      "description": "Add a competitor domain to track in a SE Ranking project — SE Ranking starts tracking their keyword positions daily. Use for: добавь конкурента, track this competitor, add competitor domain.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "create:competitor"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "project_id": {
+            "description": "SE Ranking project ID",
+            "title": "Project Id",
+            "type": "integer"
+          },
+          "url": {
+            "description": "Competitor domain to track, e.g. hostinger.com",
+            "title": "Url",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Optional display name for the competitor",
+            "title": "Name"
+          }
+        },
+        "required": [
+          "project_id",
+          "url"
+        ],
+        "title": "AddCompetitorParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "integer"
+          },
+          "url": {
+            "default": "",
+            "title": "Url",
+            "type": "string"
+          },
+          "name": {
+            "default": "",
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "AddCompetitorResult",
+        "type": "object"
+      },
+      "event": "se-ranking-connector.add_competitor",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "se_ranking"
+    },
+    {
+      "name": "delete_competitor",
+      "description": "Stop tracking a competitor domain in a SE Ranking project. Use for: убери конкурента, stop tracking this competitor, remove competitor.",
+      "action_type": "write",
+      "chain_callable": true,
+      "effects": [
+        "delete:competitor"
+      ],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "project_id": {
+            "description": "SE Ranking project ID",
+            "title": "Project Id",
+            "type": "integer"
+          },
+          "competitor_id": {
+            "description": "Competitor ID (from list_competitors)",
+            "title": "Competitor Id",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "project_id",
+          "competitor_id"
+        ],
+        "title": "DeleteCompetitorParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "properties": {
+          "deleted": {
+            "default": true,
+            "title": "Deleted",
+            "type": "boolean"
+          },
+          "competitor_id": {
+            "default": 0,
+            "title": "Competitor Id",
+            "type": "integer"
+          }
+        },
+        "title": "_DeleteAck",
+        "type": "object"
+      },
+      "event": "se-ranking-connector.delete_competitor",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "se_ranking"
+    },
+    {
+      "name": "competitor_positions",
+      "description": "Keyword positions for one tracked competitor — how they rank for your project's tracked keywords. Use for: позиции конкурента, how does this competitor rank, competitor keyword positions.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "project_id": {
+            "description": "SE Ranking project ID",
+            "title": "Project Id",
+            "type": "integer"
+          },
+          "competitor_id": {
+            "description": "Competitor ID (from list_competitors)",
+            "title": "Competitor Id",
+            "type": "integer"
+          },
+          "engine_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Filter by search engine ID",
+            "title": "Engine Id"
+          }
+        },
+        "required": [
+          "project_id",
+          "competitor_id"
+        ],
+        "title": "CompetitorPositionsParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "$defs": {
+          "CompetitorPositionRecord": {
+            "properties": {
+              "keyword": {
+                "default": "",
+                "title": "Keyword",
+                "type": "string"
+              },
+              "position": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Position"
+              },
+              "change": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Change"
+              },
+              "volume": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Volume"
+              }
+            },
+            "title": "CompetitorPositionRecord",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "project_id": {
+            "title": "Project Id",
+            "type": "integer"
+          },
+          "competitor_id": {
+            "title": "Competitor Id",
+            "type": "integer"
+          },
+          "positions": {
+            "items": {
+              "$ref": "#/$defs/CompetitorPositionRecord"
+            },
+            "title": "Positions",
+            "type": "array"
+          },
+          "count": {
+            "default": 0,
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "project_id",
+          "competitor_id"
+        ],
+        "title": "CompetitorPositionsResult",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "se_ranking"
+    },
+    {
+      "name": "serp_top10",
+      "description": "The current top-10 Google results for one specific tracked keyword — who's ranking, their backlinks/referring domains. Use for: топ-10 по ключевому слову, who ranks for this keyword, SERP results.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "project_id": {
+            "description": "SE Ranking project ID",
+            "title": "Project Id",
+            "type": "integer"
+          },
+          "keyword_id": {
+            "description": "Keyword ID (from the rankings response)",
+            "title": "Keyword Id",
+            "type": "integer"
+          },
+          "engine_id": {
+            "description": "Search engine ID (from list_projects search engines)",
+            "title": "Engine Id",
+            "type": "integer"
+          },
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Date YYYY-MM-DD, defaults to latest",
+            "title": "Date"
+          }
+        },
+        "required": [
+          "project_id",
+          "keyword_id",
+          "engine_id"
+        ],
+        "title": "SerpTop10Params",
+        "type": "object"
+      },
+      "return_schema": {
+        "$defs": {
+          "SerpResultRecord": {
+            "properties": {
+              "position": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Position"
+              },
+              "url": {
+                "default": "",
+                "title": "Url",
+                "type": "string"
+              },
+              "domain": {
+                "default": "",
+                "title": "Domain",
+                "type": "string"
+              },
+              "backlinks": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Backlinks"
+              },
+              "referring_domains": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Referring Domains"
+              }
+            },
+            "title": "SerpResultRecord",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "project_id": {
+            "title": "Project Id",
+            "type": "integer"
+          },
+          "keyword_id": {
+            "title": "Keyword Id",
+            "type": "integer"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/$defs/SerpResultRecord"
+            },
+            "title": "Results",
+            "type": "array"
+          },
+          "count": {
+            "default": 0,
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "project_id",
+          "keyword_id"
+        ],
+        "title": "SerpTop10Result",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "se_ranking"
+    },
+    {
+      "name": "all_competitors",
+      "description": "Every domain appearing in top-10 Google results for any of your tracked keywords — discover organic competitors you haven't added yet. Use for: кто ещё конкурирует, discover competitors, who else ranks for my keywords.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "project_id": {
+            "description": "SE Ranking project ID",
+            "title": "Project Id",
+            "type": "integer"
+          },
+          "engine_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Filter by search engine ID",
+            "title": "Engine Id"
+          },
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Date YYYY-MM-DD, defaults to today",
+            "title": "Date"
+          }
+        },
+        "required": [
+          "project_id"
+        ],
+        "title": "AllCompetitorsParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "$defs": {
+          "AllCompetitorRecord": {
+            "properties": {
+              "domain": {
+                "default": "",
+                "title": "Domain",
+                "type": "string"
+              },
+              "backlinks": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Backlinks"
+              },
+              "domains": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Domains"
+              },
+              "visibility": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Visibility"
+              }
+            },
+            "title": "AllCompetitorRecord",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "project_id": {
+            "title": "Project Id",
+            "type": "integer"
+          },
+          "competitors": {
+            "items": {
+              "$ref": "#/$defs/AllCompetitorRecord"
+            },
+            "title": "Competitors",
+            "type": "array"
+          },
+          "count": {
+            "default": 0,
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "project_id"
+        ],
+        "title": "AllCompetitorsResult",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "se_ranking"
+    },
+    {
+      "name": "competitor_gaps",
+      "description": "Keywords where your tracked competitors rank in the top-10 but you don't (or rank much lower) — direct content opportunities for Article Writer briefs. Use for: пробелы против конкурентов, competitor keyword gaps, what keywords are competitors beating us on, content gap analysis.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "project_id": {
+            "description": "SE Ranking project ID",
+            "title": "Project Id",
+            "type": "integer"
+          },
+          "engine_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "description": "Filter by search engine ID",
+            "title": "Engine Id"
+          }
+        },
+        "required": [
+          "project_id"
+        ],
+        "title": "CompetitorGapsParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "$defs": {
+          "CompetitorGapRecord": {
+            "properties": {
+              "keyword": {
+                "default": "",
+                "title": "Keyword",
+                "type": "string"
+              },
+              "competitor": {
+                "default": "",
+                "title": "Competitor",
+                "type": "string"
+              },
+              "competitor_position": {
+                "default": 0,
+                "title": "Competitor Position",
+                "type": "integer"
+              },
+              "our_position": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Our Position"
+              }
+            },
+            "title": "CompetitorGapRecord",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "project_id": {
+            "title": "Project Id",
+            "type": "integer"
+          },
+          "gaps": {
+            "items": {
+              "$ref": "#/$defs/CompetitorGapRecord"
+            },
+            "title": "Gaps",
+            "type": "array"
+          },
+          "count": {
+            "default": 0,
+            "title": "Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "project_id"
+        ],
+        "title": "CompetitorGapsResult",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "se_ranking"
     }
   ],
   "signals": [],
