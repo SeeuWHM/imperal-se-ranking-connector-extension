@@ -22,6 +22,7 @@ class ProjectListResponse(BaseModel):
 
 
 class RankingRecord(BaseModel):
+    id: str = ""          # keyword_id — needed for serp_top10(project_id, keyword_id, engine_id)
     keyword: str = ""
     position: str = "-"
     change: int = 0
@@ -30,6 +31,7 @@ class RankingRecord(BaseModel):
 
 class RankingsResponse(BaseModel):
     project_id: int
+    engine_id: Optional[int] = None   # pass straight into serp_top10 alongside a keyword's id
     rankings: List[RankingRecord] = Field(default_factory=list)
     count: int = 0
 

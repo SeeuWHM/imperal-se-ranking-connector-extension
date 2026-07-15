@@ -88,9 +88,11 @@ async def fn_rankings(ctx, params: RankingsParams) -> ActionResult:
     if "error" in data:
         return _err(data)
     kws = data.get("keywords") or []
-    rankings = [RankingRecord(keyword=k.get("name", ""), position=str(k.get("current_position") or "-"),
+    engine_id = data.get("engine_id")
+    rankings = [RankingRecord(id=str(k.get("id", "")), keyword=k.get("name", ""),
+                               position=str(k.get("current_position") or "-"),
                                change=k.get("change", 0), volume=k.get("volume", 0)) for k in kws[:30]]
-    result = RankingsResponse(project_id=params.project_id, rankings=rankings, count=len(kws))
+    result = RankingsResponse(project_id=params.project_id, engine_id=engine_id, rankings=rankings, count=len(kws))
     rows = [r.model_dump() for r in rankings]
     ui_node = ui.DataTable(
         columns=[

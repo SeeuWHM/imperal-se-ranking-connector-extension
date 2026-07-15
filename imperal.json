@@ -134,6 +134,11 @@
         "$defs": {
           "RankingRecord": {
             "properties": {
+              "id": {
+                "default": "",
+                "title": "Id",
+                "type": "string"
+              },
               "keyword": {
                 "default": "",
                 "title": "Keyword",
@@ -163,6 +168,18 @@
           "project_id": {
             "title": "Project Id",
             "type": "integer"
+          },
+          "engine_id": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Engine Id"
           },
           "rankings": {
             "items": {
