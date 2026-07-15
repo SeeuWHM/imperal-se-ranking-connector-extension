@@ -165,8 +165,8 @@ class CompetitorPositionsResult(BaseModel):
 
 class SerpResultRecord(BaseModel):
     position: Optional[int] = None
-    url: str = ""
-    domain: str = ""
+    url: Optional[str] = ""
+    domain: Optional[str] = ""
     backlinks: Optional[int] = None
     referring_domains: Optional[int] = None
 

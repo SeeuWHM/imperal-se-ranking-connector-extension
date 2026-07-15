@@ -188,8 +188,8 @@ async def fn_serp_top10(ctx, params: SerpTop10Params) -> ActionResult:
     if "error" in data:
         return _err(data)
     raw = data.get("data") or []
-    results = [SerpResultRecord(position=e.get("position"), url=e.get("url", ""),
-                                 domain=e.get("domain", ""), backlinks=e.get("backlinks"),
+    results = [SerpResultRecord(position=e.get("position"), url=e.get("url") or "",
+                                 domain=e.get("domain") or "", backlinks=e.get("backlinks"),
                                  referring_domains=e.get("referring_domains")) for e in raw]
     result = SerpTop10Result(project_id=params.project_id, keyword_id=params.keyword_id,
                               results=results, count=len(results))
