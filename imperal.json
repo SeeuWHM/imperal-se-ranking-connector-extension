@@ -2,7 +2,7 @@
   "manifest_schema_version": 3,
   "sdk_version": "5.9.6",
   "app_id": "se-ranking-connector",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "name": "SE Ranking Connector",
   "description": "SEO rank tracking and keyword research powered by SE Ranking: project rankings, content opportunities (quick wins, CTR gaps), keyword research (longtail/related/questions), domain analysis and project health audits. Connect your own SE Ranking account to track your own projects.",
   "icon": "icon.svg",
