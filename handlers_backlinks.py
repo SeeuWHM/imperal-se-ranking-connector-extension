@@ -64,12 +64,12 @@ async def fn_backlinks_summary(ctx, params: BacklinksSummaryParams) -> ActionRes
     )
     rows = [a.model_dump() for a in anchors]
     ui_node = ui.Section(title=f"Backlink profile: {result.target}", children=[
-        ui.KeyValue(pairs={
-            "Backlinks": str(result.backlinks),
-            "Referring domains": str(result.refdomains),
-            "Domain authority": str(result.domain_inlink_rank or "-"),
-            "Dofollow / Nofollow": f"{result.dofollow_backlinks} / {result.nofollow_backlinks}",
-        }),
+        ui.KeyValue(items=[
+            {"key": "Backlinks", "value": str(result.backlinks)},
+            {"key": "Referring domains", "value": str(result.refdomains)},
+            {"key": "Domain authority", "value": str(result.domain_inlink_rank or "-")},
+            {"key": "Dofollow / Nofollow", "value": f"{result.dofollow_backlinks} / {result.nofollow_backlinks}"},
+        ], columns=2),
         ui.DataTable(
             columns=[
                 ui.DataColumn(key="anchor", label="Anchor text", width="70%"),
