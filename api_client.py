@@ -24,7 +24,7 @@ using someone else's data.
 from __future__ import annotations
 
 from app import SERVER_URL
-from accounts import _active_api_key
+from ser_accounts import _active_api_key
 
 TIMEOUT = 30
 HEAVY_TIMEOUT = 90  # research/brief-style calls: several sequential SE Ranking API calls

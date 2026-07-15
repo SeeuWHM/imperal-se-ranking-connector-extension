@@ -14,7 +14,7 @@ from imperal_sdk.types import ActionResult
 
 from app import chat
 from api_client import call_ser
-from accounts import (
+from ser_accounts import (
     _add_account, _all_accounts, _disconnect_account, _mask, _switch_account,
 )
 from params import AccountLabelParams, SaveKeyParams

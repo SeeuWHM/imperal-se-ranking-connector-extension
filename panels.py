@@ -11,7 +11,7 @@ from __future__ import annotations
 from imperal_sdk import ui
 
 from app import ext
-from accounts import _all_accounts, _mask
+from ser_accounts import _all_accounts, _mask
 from api_client import call_ser, ser_ready
 
 _SHOWN_COLLAPSED = 8

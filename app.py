@@ -135,5 +135,5 @@ ext.secret(
 @ext.health_check
 async def health(ctx) -> dict:
     """Report whether the user has at least one SE Ranking account connected."""
-    from accounts import ser_ready
+    from ser_accounts import ser_ready
     return {"status": "ok", "version": ext.version, "seranking_connected": await ser_ready(ctx)}
