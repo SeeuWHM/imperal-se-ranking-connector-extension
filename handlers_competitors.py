@@ -7,6 +7,8 @@ se-ranking-control for the exact upstream response shapes this mirrors.
 """
 # No `from __future__ import annotations` — see handlers.py for why.
 
+from urllib.parse import urlparse
+
 from imperal_sdk import ui
 from imperal_sdk.types import ActionResult
 
@@ -188,9 +190,16 @@ async def fn_serp_top10(ctx, params: SerpTop10Params) -> ActionResult:
     if "error" in data:
         return _err(data)
     raw = data.get("data") or []
-    results = [SerpResultRecord(position=e.get("position"), url=e.get("url") or "",
-                                 domain=e.get("domain") or "", backlinks=e.get("backlinks"),
-                                 referring_domains=e.get("referring_domains")) for e in raw]
+    results = []
+    for e in raw:
+        url = e.get("url") or ""
+        # se-ranking-control's serp10 passthrough never populates `domain`
+        # (always null) even though SE Ranking's URL clearly contains one —
+        # derive it here so the UI/table isn't just a blank column.
+        domain = e.get("domain") or urlparse(url).netloc.removeprefix("www.")
+        results.append(SerpResultRecord(position=e.get("position"), url=url, domain=domain,
+                                         backlinks=e.get("backlinks"),
+                                         referring_domains=e.get("referring_domains")))
     result = SerpTop10Result(project_id=params.project_id, keyword_id=params.keyword_id,
                               results=results, count=len(results))
     rows = [r.model_dump() for r in results]

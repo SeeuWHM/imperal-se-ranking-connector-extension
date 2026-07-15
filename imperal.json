@@ -1459,14 +1459,28 @@
                 "title": "Position"
               },
               "url": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
                 "default": "",
-                "title": "Url",
-                "type": "string"
+                "title": "Url"
               },
               "domain": {
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
                 "default": "",
-                "title": "Domain",
-                "type": "string"
+                "title": "Domain"
               },
               "backlinks": {
                 "anyOf": [
