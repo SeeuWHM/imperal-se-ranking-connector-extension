@@ -204,6 +204,38 @@ class CompetitorGapsResult(BaseModel):
     count: int = 0
 
 
+# ── Backlinks ──────────────────────────────────────────────────────────────────
+
+class AnchorRecord(BaseModel):
+    anchor: str = ""
+    backlinks: int = 0
+
+
+class BacklinksSummaryResult(BaseModel):
+    target: str = ""
+    backlinks: int = 0
+    refdomains: int = 0
+    subnets: int = 0
+    ips: int = 0
+    dofollow_backlinks: int = 0
+    nofollow_backlinks: int = 0
+    domain_inlink_rank: Optional[int] = None
+    pages_with_backlinks: int = 0
+    top_anchors: List[AnchorRecord] = Field(default_factory=list)
+    credits_spent: int = 0
+
+
+class DomainAuthorityRecord(BaseModel):
+    domain: str = ""
+    domain_inlink_rank: Optional[float] = None
+
+
+class DomainAuthorityResult(BaseModel):
+    domains: List[DomainAuthorityRecord] = Field(default_factory=list)
+    count: int = 0
+    credits_spent: int = 0
+
+
 class ConnectionStatus(BaseModel):
     connected: bool = False
     masked_key: str = ""

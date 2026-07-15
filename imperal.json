@@ -1772,6 +1772,207 @@
       "long_running": false,
       "scopes": [],
       "owner_chat_tool": "se_ranking"
+    },
+    {
+      "name": "backlinks_summary",
+      "description": "Backlink authority summary for any domain (yours or a competitor's) — total backlinks, referring domains, dofollow/nofollow split, domain authority score, top anchor texts. Costs credits. Use for: сколько бэклинков, backlink profile, domain authority, link authority, анализ ссылочной массы.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "domain": {
+            "description": "Domain, host, or URL to analyze, e.g. competitor.com",
+            "title": "Domain",
+            "type": "string"
+          },
+          "mode": {
+            "default": "domain",
+            "description": "'domain' analyzes the whole domain incl. subdomains, 'host' analyzes this host only, 'url' analyzes one specific URL",
+            "title": "Mode",
+            "type": "string"
+          }
+        },
+        "required": [
+          "domain"
+        ],
+        "title": "BacklinksSummaryParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "$defs": {
+          "AnchorRecord": {
+            "properties": {
+              "anchor": {
+                "default": "",
+                "title": "Anchor",
+                "type": "string"
+              },
+              "backlinks": {
+                "default": 0,
+                "title": "Backlinks",
+                "type": "integer"
+              }
+            },
+            "title": "AnchorRecord",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "target": {
+            "default": "",
+            "title": "Target",
+            "type": "string"
+          },
+          "backlinks": {
+            "default": 0,
+            "title": "Backlinks",
+            "type": "integer"
+          },
+          "refdomains": {
+            "default": 0,
+            "title": "Refdomains",
+            "type": "integer"
+          },
+          "subnets": {
+            "default": 0,
+            "title": "Subnets",
+            "type": "integer"
+          },
+          "ips": {
+            "default": 0,
+            "title": "Ips",
+            "type": "integer"
+          },
+          "dofollow_backlinks": {
+            "default": 0,
+            "title": "Dofollow Backlinks",
+            "type": "integer"
+          },
+          "nofollow_backlinks": {
+            "default": 0,
+            "title": "Nofollow Backlinks",
+            "type": "integer"
+          },
+          "domain_inlink_rank": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "default": null,
+            "title": "Domain Inlink Rank"
+          },
+          "pages_with_backlinks": {
+            "default": 0,
+            "title": "Pages With Backlinks",
+            "type": "integer"
+          },
+          "top_anchors": {
+            "items": {
+              "$ref": "#/$defs/AnchorRecord"
+            },
+            "title": "Top Anchors",
+            "type": "array"
+          },
+          "credits_spent": {
+            "default": 0,
+            "title": "Credits Spent",
+            "type": "integer"
+          }
+        },
+        "title": "BacklinksSummaryResult",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "se_ranking"
+    },
+    {
+      "name": "domain_authority",
+      "description": "Domain authority scores for up to 100 domains at once — quick way to compare your site's authority against several competitors in one call. Costs credits. Use for: сравни авторитетность доменов, domain authority comparison, competitor authority scores.",
+      "action_type": "read",
+      "chain_callable": true,
+      "effects": [],
+      "id_projection": "",
+      "params_schema": {
+        "properties": {
+          "domains": {
+            "description": "Domains to score (up to 100), e.g. ['yoursite.com', 'competitor.com']",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 100,
+            "minItems": 1,
+            "title": "Domains",
+            "type": "array"
+          }
+        },
+        "required": [
+          "domains"
+        ],
+        "title": "DomainAuthorityParams",
+        "type": "object"
+      },
+      "return_schema": {
+        "$defs": {
+          "DomainAuthorityRecord": {
+            "properties": {
+              "domain": {
+                "default": "",
+                "title": "Domain",
+                "type": "string"
+              },
+              "domain_inlink_rank": {
+                "anyOf": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "default": null,
+                "title": "Domain Inlink Rank"
+              }
+            },
+            "title": "DomainAuthorityRecord",
+            "type": "object"
+          }
+        },
+        "properties": {
+          "domains": {
+            "items": {
+              "$ref": "#/$defs/DomainAuthorityRecord"
+            },
+            "title": "Domains",
+            "type": "array"
+          },
+          "count": {
+            "default": 0,
+            "title": "Count",
+            "type": "integer"
+          },
+          "credits_spent": {
+            "default": 0,
+            "title": "Credits Spent",
+            "type": "integer"
+          }
+        },
+        "title": "DomainAuthorityResult",
+        "type": "object"
+      },
+      "event": "",
+      "background": false,
+      "long_running": false,
+      "scopes": [],
+      "owner_chat_tool": "se_ranking"
     }
   ],
   "signals": [],

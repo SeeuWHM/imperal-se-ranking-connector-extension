@@ -1,7 +1,7 @@
 """Pydantic param models for SE Ranking chat functions."""
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel, Field
 
 
@@ -103,3 +103,21 @@ class AllCompetitorsParams(BaseModel):
 class CompetitorGapsParams(BaseModel):
     project_id: int = Field(..., description="SE Ranking project ID")
     engine_id: Optional[int] = Field(default=None, description="Filter by search engine ID")
+
+
+# ── Backlinks ────────────────────────────────────────────────────────────────
+
+class BacklinksSummaryParams(BaseModel):
+    domain: str = Field(..., description="Domain, host, or URL to analyze, e.g. competitor.com")
+    mode: str = Field(
+        default="domain",
+        description="'domain' analyzes the whole domain incl. subdomains, "
+                    "'host' analyzes this host only, 'url' analyzes one specific URL",
+    )
+
+
+class DomainAuthorityParams(BaseModel):
+    domains: List[str] = Field(
+        ..., min_length=1, max_length=100,
+        description="Domains to score (up to 100), e.g. ['yoursite.com', 'competitor.com']",
+    )
