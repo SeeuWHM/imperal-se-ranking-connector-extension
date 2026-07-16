@@ -18,6 +18,7 @@ from params import ProjectIdParams, RankingsParams, OpportunitiesParams, CTRGaps
 from response_models import (
     ProjectListResponse, ProjectRecord, RankingsResponse, RankingRecord,
     OpportunitiesResponse, OpportunityRecord, CTRGapsResponse, CTRGapRecord,
+    dedupe_opportunities,
 )
 from pydantic import BaseModel
 
@@ -129,7 +130,7 @@ async def fn_opportunities(ctx, params: OpportunitiesParams) -> ActionResult:
     }, require_user_key=True)
     if "error" in data:
         return _err(data)
-    raw = data.get("opportunities") or []
+    raw = dedupe_opportunities(data.get("opportunities") or [])
     opps = [OpportunityRecord(keyword=o.get("keyword", ""), type=o.get("type", ""),
                                priority=o.get("priority_score", 0)) for o in raw[:30]]
     result = OpportunitiesResponse(project_id=params.project_id, opportunities=opps, count=len(raw))

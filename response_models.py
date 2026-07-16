@@ -48,6 +48,23 @@ class OpportunitiesResponse(BaseModel):
     count: int = 0
 
 
+def dedupe_opportunities(raw: list[dict]) -> list[dict]:
+    """SE Ranking's harvest can return the SAME keyword several times (one row
+    per search engine / opportunity type), which reads as junk in the panel
+    ('ai managed hosting' ×6). Collapse to one row per keyword, keeping the
+    highest-priority one — the list arrives priority-desc, so the first win is
+    the best. Case-insensitive on the keyword."""
+    seen: set[str] = set()
+    out: list[dict] = []
+    for o in raw:
+        kw = (o.get("keyword") or "").strip().lower()
+        if not kw or kw in seen:
+            continue
+        seen.add(kw)
+        out.append(o)
+    return out
+
+
 class CTRGapRecord(BaseModel):
     keyword: str = ""
     impressions: int = 0

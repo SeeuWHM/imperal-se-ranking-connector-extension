@@ -10,6 +10,7 @@ from imperal_sdk import ui
 
 from app import ext
 from api_client import call_ser
+from response_models import dedupe_opportunities
 
 RANKINGS_LIMIT = 30
 OPPORTUNITIES_LIMIT = 25
@@ -55,7 +56,7 @@ async def _opportunities_section(ctx, project_id: str) -> ui.UINode:
     )
     if "error" in data:
         return ui.Alert(message=data["error"], type="error")
-    raw = data.get("opportunities") or []
+    raw = dedupe_opportunities(data.get("opportunities") or [])
     rows = [
         {"keyword": o.get("keyword", ""), "type": o.get("type", ""), "priority": o.get("priority_score", 0)}
         for o in raw[:OPPORTUNITIES_LIMIT]
