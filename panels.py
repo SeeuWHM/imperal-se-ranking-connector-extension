@@ -17,17 +17,10 @@ from api_client import call_ser, ser_ready
 _SHOWN_COLLAPSED = 8
 
 
-def _connect_form(error: str = "") -> ui.UINode:
-    children = [
-        ui.Header(text="SE Ranking", level=4),
-        ui.Badge(label="○ not connected", color="gray"),
-        ui.Divider(),
-        ui.Text(content=(
-            "Connect your own SE Ranking account to see project rankings, "
-            "content opportunities and keyword research here. You can connect "
-            "more than one account and switch between them below."
-        ), variant="body"),
-    ]
+def _key_form(error: str = "") -> list[ui.UINode]:
+    """The API-key entry form itself — reused by the not-connected prompt and by
+    the inline "add another account" block, so both stay in sync."""
+    children = []
     if error:
         children.append(ui.Alert(message=error, type="error"))
     children.append(ui.Form(
@@ -43,7 +36,21 @@ def _connect_form(error: str = "") -> ui.UINode:
         content="Get your key at online.seranking.com → Profile → API.",
         variant="caption",
     ))
-    return ui.Stack(children=children)
+    return children
+
+
+def _connect_form(error: str = "") -> ui.UINode:
+    return ui.Stack(children=[
+        ui.Header(text="SE Ranking", level=4),
+        ui.Badge(label="○ not connected", color="gray"),
+        ui.Divider(),
+        ui.Text(content=(
+            "Connect your own SE Ranking account to see project rankings, "
+            "content opportunities and keyword research here. You can connect "
+            "more than one account and switch between them below."
+        ), variant="body"),
+        *_key_form(error),
+    ])
 
 
 def _account_items(accounts: list[dict]) -> list[ui.UINode]:
@@ -69,7 +76,7 @@ def _account_items(accounts: list[dict]) -> list[ui.UINode]:
 @ext.panel("sidebar", slot="left", title="SE Ranking", icon="TrendingUp",
            default_width=260,
            refresh="on_event:se-ranking-connector.switch_account,se-ranking-connector.disconnect_account")
-async def sidebar_panel(ctx, show_all: bool = False):
+async def sidebar_panel(ctx, show_all: bool = False, show_add: bool = False):
     configured = await ser_ready(ctx)
 
     if not configured:
@@ -130,9 +137,17 @@ async def sidebar_panel(ctx, show_all: bool = False):
         ui.Divider(),
         ui.Text(content=f"Accounts ({len(accounts)})", variant="caption"),
         ui.List(items=_account_items(accounts)),
+        # Inline add-account form (expands in place — same proven mechanism as
+        # the "+N more" toggle; replaces the overlay panel that never opened).
+        ui.Stack(children=[
+            ui.Text(content="Add another account", variant="caption"),
+            *_key_form(),
+            ui.Button(label="Cancel", variant="ghost", size="sm",
+                      on_click=ui.Call("__panel__sidebar", show_add=False)),
+        ]) if show_add else
         ui.Stack(direction="h", gap=2, wrap=True, children=[
             ui.Button(label="Add another account", icon="Plus", variant="ghost", size="sm",
-                      on_click=ui.Call("__panel__sidebar_add_account")),
+                      on_click=ui.Call("__panel__sidebar", show_add=True)),
         ]),
         ui.Divider(),
         ui.Text(content="Projects by tracked keywords — click one to open", variant="caption"),
@@ -144,11 +159,3 @@ async def sidebar_panel(ctx, show_all: bool = False):
     # sidebar needed).
     root.props["auto_action"] = ui.Call("__panel__workspace").to_dict()
     return root
-
-
-@ext.panel("sidebar_add_account", slot="overlay", title="Add SE Ranking Account", icon="Plus")
-async def add_account_panel(ctx):
-    """Overlay form to connect an ADDITIONAL SE Ranking account without
-    disturbing the currently-active one — same pattern as mail-client's
-    add_account overlay."""
-    return _connect_form()

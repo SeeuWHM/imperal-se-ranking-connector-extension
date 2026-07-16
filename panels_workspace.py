@@ -15,11 +15,12 @@ RANKINGS_LIMIT = 30
 OPPORTUNITIES_LIMIT = 25
 
 
-async def _rankings_section(ctx, project_id: str) -> ui.UINode:
+async def _rankings_section(ctx, project_id: str, show_all: bool = False) -> ui.UINode:
     data = await call_ser(ctx, "GET", f"/v1/rankings/{project_id}", require_user_key=True)
     if "error" in data:
         return ui.Alert(message=data["error"], type="error")
     kws = data.get("keywords") or []
+    shown = kws if show_all else kws[:RANKINGS_LIMIT]
     rows = [
         {
             "keyword": k.get("name", ""),
@@ -27,7 +28,7 @@ async def _rankings_section(ctx, project_id: str) -> ui.UINode:
             "change": k.get("change", 0),
             "volume": k.get("volume", 0),
         }
-        for k in kws[:RANKINGS_LIMIT]
+        for k in shown
     ]
     body = ui.DataTable(
         columns=[
@@ -38,9 +39,13 @@ async def _rankings_section(ctx, project_id: str) -> ui.UINode:
         ],
         rows=rows,
     ) if rows else ui.Text(content="No ranking data yet.", variant="caption")
-    return ui.Stack(gap=1, children=[
-        ui.Header(text=f"Rankings ({len(kws)} tracked)", level=5), body,
-    ])
+    children = [ui.Header(text=f"Rankings ({len(kws)} tracked)", level=5), body]
+    if not show_all and len(kws) > RANKINGS_LIMIT:
+        children.append(ui.Button(
+            label=f"Load all {len(kws)} keywords", variant="ghost", size="sm",
+            on_click=ui.Call("__panel__workspace", project_id=project_id, show_all=True),
+        ))
+    return ui.Stack(gap=1, children=children)
 
 
 async def _opportunities_section(ctx, project_id: str) -> ui.UINode:
@@ -69,12 +74,12 @@ async def _opportunities_section(ctx, project_id: str) -> ui.UINode:
 
 
 @ext.panel("workspace", slot="center", title="SE Ranking", icon="TrendingUp")
-async def workspace_panel(ctx, project_id: str = ""):
+async def workspace_panel(ctx, project_id: str = "", show_all: bool = False):
     if not project_id:
         return ui.Empty(message="Pick a project on the left to see its rankings and top keyword opportunities.")
 
     rankings, opportunities = (
-        await _rankings_section(ctx, project_id),
+        await _rankings_section(ctx, project_id, show_all),
         await _opportunities_section(ctx, project_id),
     )
     return ui.Stack(children=[rankings, ui.Divider(), opportunities])

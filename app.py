@@ -40,7 +40,7 @@ SERVER_URL = os.environ.get("SER_BACKEND_URL", "") or "https://api.webhostmost.c
 
 ext = Extension(
     "se-ranking-connector",
-    version="1.1.1",
+    version="1.2.0",
     display_name="SE Ranking Connector",
     description=(
         "SEO rank tracking and keyword research powered by SE Ranking: project "
