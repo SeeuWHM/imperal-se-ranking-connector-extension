@@ -1,8 +1,8 @@
 {
   "manifest_schema_version": 3,
-  "sdk_version": "5.9.6",
+  "sdk_version": "5.9.9",
   "app_id": "se-ranking-connector",
-  "version": "1.1.1",
+  "version": "1.2.1",
   "name": "SE Ranking Connector",
   "description": "SEO rank tracking and keyword research powered by SE Ranking: project rankings, content opportunities (quick wins, CTR gaps), keyword research (longtail/related/questions), domain analysis and project health audits. Connect your own SE Ranking account to track your own projects.",
   "icon": "icon.svg",
@@ -2141,7 +2141,7 @@
       "name": "backend_jwt",
       "description": "Platform JWT authenticating this extension to the se-ranking-control backend microservice. Developer-managed only — never entered or seen by end users.",
       "required": true,
-      "write_mode": "extension",
+      "write_mode": "user",
       "max_bytes": 2048,
       "scope": "app",
       "env_fallback": "IMPERAL_APPSECRET_SE_RANKING_BACKEND_JWT"
@@ -2182,15 +2182,6 @@
       "refresh": "on_event:se-ranking-connector.switch_account,se-ranking-connector.disconnect_account",
       "center_overlay": false,
       "default_width": 260
-    },
-    {
-      "panel_id": "sidebar_add_account",
-      "slot": "overlay",
-      "title": "Add SE Ranking Account",
-      "tree": {},
-      "icon": "Plus",
-      "refresh": "manual",
-      "center_overlay": false
     },
     {
       "panel_id": "workspace",

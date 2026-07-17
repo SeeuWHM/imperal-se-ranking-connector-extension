@@ -82,8 +82,7 @@ ext.secret(
         "by end users."
     ),
     required=True,
-    write_mode="extension",
-    scope="app",
+    scope="app",  # app-scope secrets are owner-only regardless of write_mode (SDK 5.9.9 warns on a redundant write_mode= here)
     env_fallback="IMPERAL_APPSECRET_SE_RANKING_BACKEND_JWT",
     max_bytes=2048,
 )(lambda: None)
