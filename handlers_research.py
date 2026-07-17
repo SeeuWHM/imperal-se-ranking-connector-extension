@@ -29,7 +29,7 @@ def _err(data: dict) -> ActionResult:
     "estimate_keyword_cost",
     description=(
         "Estimate SE Ranking credit cost for researching a keyword BEFORE spending "
-        "any — always call this first. Use for: сколько это будет стоить, estimate "
+        "any — always call this first. Use for: estimate "
         "cost, credit estimate for keyword research."
     ),
     action_type="read",
@@ -56,7 +56,7 @@ async def fn_estimate_keyword_cost(ctx, params: KeywordEstimateParams) -> Action
     description=(
         "Expand a seed keyword into longtail variants, related keywords and "
         "questions people ask — real SE Ranking data, spends credits. Use for: "
-        "найди ключевые слова, keyword research, longtail keywords, related "
+        "keyword research, longtail keywords, related "
         "keywords, questions about topic, keyword ideas."
     ),
     action_type="read",
@@ -87,7 +87,7 @@ async def fn_research_keywords(ctx, params: KeywordExpandParams) -> ActionResult
     description=(
         "Traffic overview for any domain (yours or a competitor's) — organic "
         "traffic estimate, keyword count, top pages. Costs credits. Use for: "
-        "анализ домена, domain overview, competitor traffic estimate."
+        "domain overview, competitor traffic estimate."
     ),
     action_type="read",
     chain_callable=True,
@@ -117,7 +117,7 @@ async def fn_domain_overview(ctx, params: DomainOverviewParams) -> ActionResult:
     "domain_keywords",
     description=(
         "Keywords a domain ranks for organically or via paid ads — volume, "
-        "difficulty, position. Costs credits. Use for: ключевые слова конкурента, "
+        "difficulty, position. Costs credits. Use for: "
         "keywords a domain ranks for, competitor keyword list."
     ),
     action_type="read",
@@ -146,7 +146,7 @@ async def fn_domain_keywords(ctx, params: DomainKeywordsParams) -> ActionResult:
     description=(
         "Full project health audit — zero extra credits. Surfaces CTR gaps, "
         "keywords ranking but not tracked, deep-ranking slots wasting quota. "
-        "Use for: аудит проекта, project audit, health check my SEO, "
+        "Use for: project audit, health check my SEO, "
         "what's wrong with my rankings."
     ),
     action_type="read",

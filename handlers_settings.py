@@ -33,7 +33,7 @@ class _EmptyParams(BaseModel):
     "connection_status",
     description=(
         "Whether the user's own SE Ranking API key is connected. Use for: "
-        "подключен ли SE Ranking, is my account connected, connection status."
+        "is my account connected, connection status."
     ),
     action_type="read",
     chain_callable=True,
@@ -57,9 +57,8 @@ async def fn_connection_status(ctx, params: _EmptyParams) -> ActionResult:
         "the key against SE Ranking before saving — rejects it if invalid. "
         "Connecting again adds ANOTHER account (each with its own label) rather "
         "than replacing the current one — use switch_account to change which "
-        "one is active. Use for: подключи мой SE Ranking, сохрани ключ, connect "
-        "my SE Ranking account, save my API key, add seranking key, добавь ещё "
-        "один аккаунт SE Ranking."
+        "one is active. Use for: connect "
+        "my SE Ranking account, save my API key, add seranking key."
     ),
     action_type="write",
     event="se-ranking-connector.save_seranking_key",
@@ -97,7 +96,7 @@ async def fn_save_seranking_key(ctx, params: SaveKeyParams) -> ActionResult:
     "list_seranking_accounts",
     description=(
         "List every SE Ranking account you've connected — label, masked key, "
-        "which one is active. Use for: покажи мои аккаунты se ranking, list "
+        "which one is active. Use for: list "
         "connected accounts, which SE Ranking account is active."
     ),
     action_type="read",
@@ -122,7 +121,7 @@ async def fn_list_seranking_accounts(ctx, params: _EmptyParams) -> ActionResult:
     description=(
         "Switch which connected SE Ranking account is active — all following "
         "SE Ranking calls (projects, rankings, keywords…) use this account's "
-        "key. Use for: переключи аккаунт se ranking, switch to account X, use "
+        "key. Use for: switch to account X, use "
         "my other SE Ranking key."
     ),
     action_type="write",
@@ -148,7 +147,7 @@ async def fn_switch_seranking_account(ctx, params: AccountLabelParams) -> Action
     description=(
         "Disconnect ONE specific connected SE Ranking account by its label — "
         "removes only that key, other connected accounts stay untouched. Use "
-        "for: отключи этот аккаунт se ranking, remove this specific account."
+        "for: remove this specific account."
     ),
     action_type="destructive",
     event="se-ranking-connector.disconnect_account",
@@ -172,8 +171,8 @@ async def fn_disconnect_seranking_account(ctx, params: AccountLabelParams) -> Ac
     "disconnect_seranking",
     description=(
         "Disconnect your SE Ranking account(s) — removes ALL saved API keys. "
-        "Use for: отключи SE Ranking, disconnect my account, remove my API key, "
-        "забудь мой ключ, disconnect everything."
+        "Use for: disconnect my account, remove my API key, "
+        "disconnect everything."
     ),
     action_type="destructive",
     event="se-ranking-connector.disconnect_seranking",

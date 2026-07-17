@@ -38,7 +38,7 @@ class _EmptyParams(BaseModel):
     "list_projects",
     description=(
         "List your SE Ranking projects (tracked websites) — id, title, url, "
-        "keyword count. Use for: покажи мои проекты, какие сайты отслеживаются, "
+        "keyword count. Use for: "
         "list my SE Ranking projects, show tracked sites."
     ),
     action_type="read",
@@ -73,8 +73,8 @@ async def fn_list_projects(ctx, params: _EmptyParams) -> ActionResult:
     "rankings",
     description=(
         "Current Google search positions for all tracked keywords in a project — "
-        "position, change, volume, CPC. Use for: покажи позиции, SEO rankings, "
-        "какие позиции у ключевых слов, current rankings, keyword positions."
+        "position, change, volume, CPC. Use for: SEO rankings, "
+        "current rankings, keyword positions."
     ),
     action_type="read",
     chain_callable=True,
@@ -115,8 +115,8 @@ async def fn_rankings(ctx, params: RankingsParams) -> ActionResult:
         "Content opportunities from data SE Ranking already collected (zero extra "
         "credits): quick wins (ranking 4-20, easy to push to page 1), CTR gaps "
         "(showing in search but nobody clicks), keywords not tracked yet. "
-        "Use for: что писать дальше, quick wins, content opportunities, "
-        "какие темы улучшить, over what should I write next."
+        "Use for: quick wins, content opportunities, "
+        "over what should I write next."
     ),
     action_type="read",
     chain_callable=True,
@@ -151,7 +151,7 @@ async def fn_opportunities(ctx, params: OpportunitiesParams) -> ActionResult:
     description=(
         "Keywords with high search impressions but low click-through rate — "
         "titles/meta descriptions likely need work. Use for: CTR gaps, "
-        "низкий CTR, что не кликают, improve click-through rate."
+        "improve click-through rate."
     ),
     action_type="read",
     chain_callable=True,

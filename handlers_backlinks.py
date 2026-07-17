@@ -30,9 +30,8 @@ def _err(data: dict) -> ActionResult:
     description=(
         "Backlink authority summary for any domain (yours or a competitor's) — "
         "total backlinks, referring domains, dofollow/nofollow split, domain "
-        "authority score, top anchor texts. Costs credits. Use for: сколько "
-        "бэклинков, backlink profile, domain authority, link authority, анализ "
-        "ссылочной массы."
+        "authority score, top anchor texts. Costs credits. Use for: "
+        "backlink profile, domain authority, link authority."
     ),
     action_type="read",
     chain_callable=True,
@@ -90,7 +89,7 @@ async def fn_backlinks_summary(ctx, params: BacklinksSummaryParams) -> ActionRes
     description=(
         "Domain authority scores for up to 100 domains at once — quick way to "
         "compare your site's authority against several competitors in one call. "
-        "Costs credits. Use for: сравни авторитетность доменов, domain authority "
+        "Costs credits. Use for: domain authority "
         "comparison, competitor authority scores."
     ),
     action_type="read",

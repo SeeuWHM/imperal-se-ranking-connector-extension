@@ -45,7 +45,7 @@ class _DeleteAck(BaseModel):
     "list_competitors",
     description=(
         "List the competitor domains tracked for a SE Ranking project. Use for: "
-        "какие конкуренты отслеживаются, list my competitors, show tracked "
+        "list my competitors, show tracked "
         "competitor domains."
     ),
     action_type="read",
@@ -78,8 +78,8 @@ async def fn_list_competitors(ctx, params: ListCompetitorsParams) -> ActionResul
     "add_competitor",
     description=(
         "Add a competitor domain to track in a SE Ranking project — SE Ranking "
-        "starts tracking their keyword positions daily. Use for: добавь "
-        "конкурента, track this competitor, add competitor domain."
+        "starts tracking their keyword positions daily. Use for: "
+        "track this competitor, add competitor domain."
     ),
     action_type="write",
     event="se-ranking-connector.add_competitor",
@@ -102,7 +102,7 @@ async def fn_add_competitor(ctx, params: AddCompetitorParams) -> ActionResult:
     "delete_competitor",
     description=(
         "Stop tracking a competitor domain in a SE Ranking project. Use for: "
-        "убери конкурента, stop tracking this competitor, remove competitor."
+        "stop tracking this competitor, remove competitor."
     ),
     action_type="write",
     event="se-ranking-connector.delete_competitor",
@@ -125,7 +125,7 @@ async def fn_delete_competitor(ctx, params: DeleteCompetitorParams) -> ActionRes
     "competitor_positions",
     description=(
         "Keyword positions for one tracked competitor — how they rank for your "
-        "project's tracked keywords. Use for: позиции конкурента, how does this "
+        "project's tracked keywords. Use for: how does this "
         "competitor rank, competitor keyword positions."
     ),
     action_type="read",
@@ -173,8 +173,8 @@ async def fn_competitor_positions(ctx, params: CompetitorPositionsParams) -> Act
     "serp_top10",
     description=(
         "The current top-10 Google results for one specific tracked keyword — "
-        "who's ranking, their backlinks/referring domains. Use for: топ-10 по "
-        "ключевому слову, who ranks for this keyword, SERP results."
+        "who's ranking, their backlinks/referring domains. Use for: "
+        "who ranks for this keyword, SERP results."
     ),
     action_type="read",
     chain_callable=True,
@@ -221,7 +221,7 @@ async def fn_serp_top10(ctx, params: SerpTop10Params) -> ActionResult:
     description=(
         "Every domain appearing in top-10 Google results for any of your "
         "tracked keywords — discover organic competitors you haven't added yet. "
-        "Use for: кто ещё конкурирует, discover competitors, who else ranks for "
+        "Use for: discover competitors, who else ranks for "
         "my keywords."
     ),
     action_type="read",
@@ -264,7 +264,7 @@ async def fn_all_competitors(ctx, params: AllCompetitorsParams) -> ActionResult:
     description=(
         "Keywords where your tracked competitors rank in the top-10 but you "
         "don't (or rank much lower) — direct content opportunities for Article "
-        "Writer briefs. Use for: пробелы против конкурентов, competitor "
+        "Writer briefs. Use for: competitor "
         "keyword gaps, what keywords are competitors beating us on, content "
         "gap analysis."
     ),

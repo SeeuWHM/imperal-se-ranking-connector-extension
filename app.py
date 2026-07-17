@@ -65,11 +65,10 @@ chat = ChatExtension(
     tool_name="se_ranking",
     description=(
         "SE Ranking — SEO rank tracking and keyword research. Use for: Google "
-        "search positions/rankings for MY tracked project (покажи позиции, SEO "
-        "rankings), content opportunities / quick wins / CTR gaps (что писать "
-        "дальше, quick wins), keyword research — longtail/related/questions "
-        "(найди ключевые слова, keyword research), domain analysis (анализ "
-        "домена конкурента), project health audit (аудит проекта)."
+        "search positions/rankings for MY tracked project (SEO "
+        "rankings), content opportunities / quick wins / CTR gaps (quick "
+        "wins), keyword research — longtail/related/questions "
+        "(keyword research), domain analysis, project health audit."
     ),
     max_rounds=10,
 )
