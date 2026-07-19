@@ -40,7 +40,7 @@ SERVER_URL = os.environ.get("SER_BACKEND_URL", "") or "https://api.webhostmost.c
 
 ext = Extension(
     "se-ranking-connector",
-    version="1.2.1",
+    version="1.3.0",
     display_name="SE Ranking Connector",
     description=(
         "SEO rank tracking and keyword research powered by SE Ranking: project "
@@ -128,6 +128,13 @@ ext.secret(
     scope="user",
     max_bytes=8192,
 )(lambda: None)
+
+
+# ctx.cache — short-lived (platform-capped 5-300s) per-user cache so the
+# sidebar project-list and workspace rankings/opportunities panels don't
+# re-hit se-ranking-control on every render. See cache_helpers.py.
+from cache_helpers import CachedSerPayload  # noqa: E402
+ext.cache_model("ser_payload")(CachedSerPayload)
 
 
 @ext.health_check

@@ -6,18 +6,27 @@ server-side — zero LLM tokens, same pattern as article-writer's own panels.
 """
 from __future__ import annotations
 
+import asyncio
+
 from imperal_sdk import ui
 
 from app import ext
 from api_client import call_ser
+from cache_helpers import OPPORTUNITIES_CACHE_TTL, RANKINGS_CACHE_TTL, cached_call
 from response_models import dedupe_opportunities
+from ser_accounts import _active_api_key
 
 RANKINGS_LIMIT = 30
 OPPORTUNITIES_LIMIT = 25
 
 
 async def _rankings_section(ctx, project_id: str, show_all: bool = False) -> ui.UINode:
-    data = await call_ser(ctx, "GET", f"/v1/rankings/{project_id}", require_user_key=True)
+    key = await _active_api_key(ctx)
+
+    async def _fetch() -> dict:
+        return await call_ser(ctx, "GET", f"/v1/rankings/{project_id}", require_user_key=True)
+
+    data = await cached_call(ctx, "rankings", key, {"project_id": project_id}, RANKINGS_CACHE_TTL, _fetch) if key else await _fetch()
     if "error" in data:
         return ui.Alert(message=data["error"], type="error")
     kws = data.get("keywords") or []
@@ -50,10 +59,15 @@ async def _rankings_section(ctx, project_id: str, show_all: bool = False) -> ui.
 
 
 async def _opportunities_section(ctx, project_id: str) -> ui.UINode:
-    data = await call_ser(
-        ctx, "GET", f"/v1/harvest/{project_id}/opportunities",
-        params={"min_volume": 0, "min_impressions": 0, "limit": OPPORTUNITIES_LIMIT}, require_user_key=True,
-    )
+    key = await _active_api_key(ctx)
+
+    async def _fetch() -> dict:
+        return await call_ser(
+            ctx, "GET", f"/v1/harvest/{project_id}/opportunities",
+            params={"min_volume": 0, "min_impressions": 0, "limit": OPPORTUNITIES_LIMIT}, require_user_key=True,
+        )
+
+    data = await cached_call(ctx, "opportunities", key, {"project_id": project_id}, OPPORTUNITIES_CACHE_TTL, _fetch) if key else await _fetch()
     if "error" in data:
         return ui.Alert(message=data["error"], type="error")
     raw = dedupe_opportunities(data.get("opportunities") or [])
@@ -79,8 +93,8 @@ async def workspace_panel(ctx, project_id: str = "", show_all: bool = False):
     if not project_id:
         return ui.Empty(message="Pick a project on the left to see its rankings and top keyword opportunities.")
 
-    rankings, opportunities = (
-        await _rankings_section(ctx, project_id, show_all),
-        await _opportunities_section(ctx, project_id),
+    rankings, opportunities = await asyncio.gather(
+        _rankings_section(ctx, project_id, show_all),
+        _opportunities_section(ctx, project_id),
     )
     return ui.Stack(children=[rankings, ui.Divider(), opportunities])

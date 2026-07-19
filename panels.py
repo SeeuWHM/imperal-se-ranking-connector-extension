@@ -11,8 +11,9 @@ from __future__ import annotations
 from imperal_sdk import ui
 
 from app import ext
-from ser_accounts import _all_accounts, _mask
+from ser_accounts import _active_api_key, _all_accounts, _mask
 from api_client import call_ser, ser_ready
+from cache_helpers import PROJECTS_CACHE_TTL, cached_call
 
 _SHOWN_COLLAPSED = 8
 
@@ -82,7 +83,11 @@ async def sidebar_panel(ctx, show_all: bool = False, show_add: bool = False):
     if not configured:
         return _connect_form()
 
-    data = await call_ser(ctx, "GET", "/v1/projects", require_user_key=True)
+    async def _fetch() -> dict:
+        return await call_ser(ctx, "GET", "/v1/projects", require_user_key=True)
+
+    key = await _active_api_key(ctx)
+    data = await cached_call(ctx, "projects", key, None, PROJECTS_CACHE_TTL, _fetch) if key else await _fetch()
     if "error" in data:
         # A stored key that SE Ranking now rejects (revoked/expired) should
         # drop back to the connect form with the real reason shown, not a
